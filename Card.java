@@ -8,20 +8,20 @@ public class Card {
     public String suite;
     public int value;
 
-    private static String[] rankList = {"2", "3", "4", "5", "6", "7", 
+    public static String[] RANK_LIST = {"2", "3", "4", "5", "6", "7", 
                                         "8", "9", "10", "J", "Q", "K", 
                                         "A"};
-    private static String[] suiteList = {"H", "C", "S", "D"};
+    public static String[] SUITE_LIST = {"H", "C", "S", "D"};
 
     public Card(String r, String s) {
-        for (String str : rankList) {
+        for (String str : RANK_LIST) {
             if (str.equals(r)) {
                 this.rank = r;
                 break;
             }
         }
 
-        for (String str : suiteList) {
+        for (String str : SUITE_LIST) {
             if (str.equals(s)) {
                 this.suite = s;
                 break;
@@ -32,7 +32,7 @@ public class Card {
     }
 
     // Generates the shorthand string name of the card, e.g "AD" is ace of diamonds.
-    public String generateName() {
+    public String name() {
         return rank + suite;
     }
 
@@ -40,11 +40,11 @@ public class Card {
     public void switchAceValue() {
         switch (value) {
             case 11:
-                this.value = 1;
+                value = 1;
                 break;
         
             case 1:
-                this.value = 11;
+                value = 11;
                 break;
             default:
                 break;
@@ -62,8 +62,8 @@ public class Card {
      * @return an integer value between 2 and 11.
      */
     private int calculateValue() {
-        for (int i = 0; i < rankList.length; i++) {
-            if (rank.equals(rankList[i]) && i < 8) {
+        for (int i = 0; i < RANK_LIST.length; i++) {
+            if (rank.equals(RANK_LIST[i]) && i < 8) {
                 return i + 2;
             } else if (rank.equals("A")) {
                 return 11;
