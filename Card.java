@@ -14,6 +14,8 @@ public class Card {
     public static String[] SUITE_LIST = {"H", "C", "S", "D"};
 
     public Card(String r, String s) {
+        String upperCaseSuite = s.toUpperCase();
+
         for (String str : RANK_LIST) {
             if (str.equals(r)) {
                 this.rank = r;
@@ -22,8 +24,8 @@ public class Card {
         }
 
         for (String str : SUITE_LIST) {
-            if (str.equals(s)) {
-                this.suite = s;
+            if (str.equals(upperCaseSuite)) {
+                this.suite = upperCaseSuite;
                 break;
             }
         }

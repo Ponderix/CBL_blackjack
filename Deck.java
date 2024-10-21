@@ -45,16 +45,17 @@ public class Deck {
         return next;
     }
 
+    // DEBUG FUNCTION
     public static void main(String[] args) {
         /* Card foo = new Card("A", "H");
         System.out.println(foo.name());
-        System.out.println(foo.value); */
+        System.out.println(foo.value); 
 
         Deck goo = new Deck();
         System.out.println(goo.list.size());
         goo.shuffle();
         for (int i = 0; i < Deck.LENGTH; i++) {
             System.out.println(goo.getNextCard().name());
-        }
+        }*/
     }
 }

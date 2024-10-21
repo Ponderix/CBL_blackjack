@@ -1,20 +1,56 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class Person {
+    protected int handValue = -1;
+    protected ArrayList<Card> hand = new ArrayList<>();
 
     // Class: Person 
-// Base class for both players and dealer. 
-// Stores hand, hand value, and some basic methods for managing hands. 
+    // Base class for both players and dealer. 
+    // Stores hand, hand value, and some basic methods for managing hands. 
 
-// Class: Player (extends Person) 
-// Represents a player. 
-// Has methods for betting, hitting, and deciding when to stand. 
+    public void calculateHandValue() {
+        int value = 0;
+        ArrayList<Card> aces = new ArrayList<>();
 
-// Class: Dealer (extends Person) 
-// Handles dealer-specific rules like drawing until 17+ and revealing hidden cards. 
+        for (int i = 0; i < hand.size(); i++) {
+            if (hand.get(i).rank.equals("A")) {
+                aces.add(hand.get(i));
+            }
+        }
 
-    // reduceAceValue() 
-// Changes Ace values from 11 to 1 if the hand goes over 21. 
+        for (Card card : hand) {
+            value += card.value;
+        }
 
-// calculateHandValue() 
-// Sums up the hand value, handles Ace as 1 or 11 correctly.
-    
+        if (aces.size() > 0 && value > 21) {
+            for (Card ace : aces) {
+                ace.switchAceValue();
+            }
+            calculateHandValue();
+        } else {
+            handValue = value;
+        }
+    }
+
+    public void dealHand(Deck deck) {
+        hand.add(deck.getNextCard());
+        hand.add(deck.getNextCard());
+
+        calculateHandValue();
+    }
+
+    // DEBUG FUNCTION
+    public static void main(String[] args) {
+        ArrayList<Card> list = new ArrayList<>();
+        list.add(new Card("2", "H"));
+        list.add(new Card("3", "d"));
+
+        Person joe = new Person();
+        Deck deck = new Deck();
+        deck.shuffle();
+
+        joe.dealHand(deck);
+        System.out.println(joe.handValue);
+    }
 }
