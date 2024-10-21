@@ -2,8 +2,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Person {
-    protected int handValue = -1;
+    protected int handValue = 0;
     protected ArrayList<Card> hand = new ArrayList<>();
+    protected boolean currentTurn = false;
 
     // Class: Person 
     // Base class for both players and dealer. 

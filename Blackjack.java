@@ -1,8 +1,9 @@
 // Blackjack Game Pseudocode with Comments 
 
 public class Blackjack {
+
+    // DEBUG FUNCTION
     public static void main(String[] args) {
-        Player jack = new Player();
     }
 }
 
