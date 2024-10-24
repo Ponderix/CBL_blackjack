@@ -55,7 +55,7 @@ public class Card {
 
     // INCOMPLETE
     public String getImagePath() {
-        return null;
+        return "./cards/" + name() + ".png";
     }
 
     /**
