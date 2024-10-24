@@ -1,78 +1,41 @@
-// Class: Card 
-// Represents a card with value, type, and image. 
-// Has methods to get value, check if it’s an Ace, and get image path. 
+import java.io.File;
 
 public class Card {
+    String value;
+    String type;
 
-    public String rank;
-    public String suite;
-    public int value;
-
-    public static String[] RANK_LIST = {"2", "3", "4", "5", "6", "7", 
-                                        "8", "9", "10", "J", "Q", "K", 
-                                        "A"};
-    public static String[] SUITE_LIST = {"H", "C", "S", "D"};
-
-    public Card(String r, String s) {
-        String upperCaseSuite = s.toUpperCase();
-
-        for (String str : RANK_LIST) {
-            if (str.equals(r)) {
-                this.rank = r;
-                break;
-            }
-        }
-
-        for (String str : SUITE_LIST) {
-            if (str.equals(upperCaseSuite)) {
-                this.suite = upperCaseSuite;
-                break;
-            }
-        }
-
-        this.value = calculateValue();
+    // Constructor to initialize a card with its value and type
+    public Card(String value, String type) {
+        this.value = value;
+        this.type = type;
     }
 
-    // Generates the shorthand string name of the card, e.g "AD" is ace of diamonds.
-    public String name() {
-        return rank + suite;
-    }
-
-    // If the card is an ace it switches its value to 11 or 1.
-    public void switchAceValue() {
-        switch (value) {
-            case 11:
-                value = 1;
-                break;
-        
-            case 1:
-                value = 11;
-                break;
-            default:
-                break;
-        }
-    }
-
-    // INCOMPLETE
+    // Method to get the image path for the card's image file based on the "8s.png" naming convention
     public String getImagePath() {
-        return "./cards/" + name() + ".png";
+        // Construct the file path using value and type without the hyphen
+        String path = "./cards/" + value.toLowerCase() + type.toLowerCase() + ".png";
+        
+        // Debugging: Print the path to ensure it's correct
+        System.out.println("Attempting to load image from: " + path);
+        
+        // Check if the file exists
+        File file = new File(path);
+        if (file.exists()) {
+            return path;
+        } else {
+            System.out.println("Image file not found: " + path);
+            return null;
+        }
     }
 
-    /**
-     * Returns the value of the card according to the blackjack rules.
-     * Aces are by default 11 unless specified by the switchAceValue function.
-     * @return an integer value between 2 and 11.
-     */
-    private int calculateValue() {
-        for (int i = 0; i < RANK_LIST.length; i++) {
-            if (rank.equals(RANK_LIST[i]) && i < 8) {
-                return i + 2;
-            } else if (rank.equals("A")) {
-                return 11;
-            } else if (i >= 8) {
-                return 10;
-            }
+    // Method to return the numerical value of the card in the context of Blackjack
+    public int getValue() {
+        if ("JQK".contains(value)) {
+            return 10;
+        } else if (value.equals("A")) {
+            return 11;
+        } else {
+            return Integer.parseInt(value);
         }
-        return 0;
     }
 }

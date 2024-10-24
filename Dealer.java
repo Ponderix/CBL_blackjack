@@ -1,6 +1,14 @@
-// Class: Dealer (extends Person) 
-// Handles dealer-specific rules like drawing until 17+ and revealing hidden cards. 
 public class Dealer extends Person {
+    public Card hiddenCard;
+
+    public void dealHand(Deck deck) {
+        hiddenCard = deck.getNextCard(); 
+        hand.add(hiddenCard);
+        Card visibleCard = deck.getNextCard(); 
+        hand.add(visibleCard);
+        calculateHandValue();
+    }
+
     public void draw(Deck deck) {
         if (!currentTurn) {
             return;
@@ -10,20 +18,11 @@ public class Dealer extends Person {
             Card next = deck.getNextCard();
             hand.add(next);
             calculateHandValue();
-            System.out.println("added card: " + next.name());
+            System.out.println("Dealer draws: " + next.value + "-" + next.type);
         }
     }
 
-    // DEBUG FUNCTION
-    public static void main(String[] args) {
-        Dealer joe = new Dealer();
-        Deck deck = new Deck();
-        deck.shuffle();
-
-        joe.dealHand(deck);
-        System.out.println(joe.handValue);
-        joe.currentTurn = true;
-        joe.draw(deck);
-        System.out.println(joe.handValue);
+    public void revealHiddenCard() {
+        System.out.println("Dealer reveals hidden card: " + hiddenCard.value + "-" + hiddenCard.type);
     }
 }
