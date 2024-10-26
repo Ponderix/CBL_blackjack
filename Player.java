@@ -1,12 +1,43 @@
+// Class: Player (extends Person) 
+// Represents a player. 
+// Has methods for betting, hitting, and deciding when to stand. 
 public class Player extends Person {
-    float money = 100f;
+    public float money;
+    public float bet;
 
-    public void hit() {
-        hand.add(new Card());
+    public Player(float startMoney) {
+        this.money = startMoney;
     }
-    public void reset() {
-        for (int i = 2; i < hand.size(); i++) {
-            hand.remove(i);
+
+    public void betMoney(float amount) {
+        if (amount > money || !currentTurn) {
+            return;
         }
+        money -= amount;
+    }
+
+    public void stand() {
+        if (!currentTurn) {
+            return;
+        }
+    }
+
+    public void hit(Deck deck) {
+        if (!currentTurn) {
+            return;
+        }
+        hand.add(deck.getNextCard());
+        calculateHandValue();
+    }
+
+    public void surrender() {
+        if (!currentTurn) {
+            return;
+        }
+    }
+
+    public void doubleDown(Deck deck) {
+        hand.add(deck.getNextCard());
+        calculateHandValue();
     }
 }
