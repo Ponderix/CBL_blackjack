@@ -96,10 +96,13 @@ public class Window {
                     if (betAmount > player.money || betAmount <= 0) {
                         throw new InvalidBetException(
                             "Bet amount exceeds limit or is non-positive.");
+                    } else {
+                        gamePanel.start = true;
                     }
 
                     player.bet(betAmount);
                     player.updateLabels(betLabel, moneyLabel);
+                    gamePanel.updateScores();
 
                     /* disable double down if subtracting the same bet amount again  
                     would result in negative money.*/ 
@@ -140,14 +143,13 @@ public class Window {
                     standBtn.setEnabled(false);
                     nextRoundBtn.setEnabled(true);
 
-                    gamePanel.updateScores();
-
                     infoLabel.setText("You lost. Next round.");
                     player.payout(0);
                     
                     gamePanel.reveal = true;
                     player.updateLabels(betLabel, moneyLabel);
 
+                    gamePanel.updateScores();
                     gamePanel.repaint();
                 } else if (player.handValue == 21) {
                     hitBtn.setEnabled(false);
@@ -155,12 +157,12 @@ public class Window {
                     nextRoundBtn.setEnabled(true);
 
                     dealer.draw(deck);
-                    gamePanel.updateScores();
                     calculateWinner(infoLabel);
 
                     gamePanel.reveal = true;
                     player.updateLabels(betLabel, moneyLabel);
 
+                    gamePanel.updateScores();
                     gamePanel.repaint();
                 }                    
             }
@@ -174,12 +176,12 @@ public class Window {
                 nextRoundBtn.setEnabled(true);
 
                 dealer.draw(deck);
-                gamePanel.updateScores();
                 calculateWinner(infoLabel);
 
                 gamePanel.reveal = true;
                 player.updateLabels(betLabel, moneyLabel);
 
+                gamePanel.updateScores();
                 gamePanel.repaint();
             }
         });
@@ -204,16 +206,16 @@ public class Window {
                 standBtn.setEnabled(false);
                 surrenderBtn.setEnabled(false);
                 doubleDownBtn.setEnabled(false);
+                nextRoundBtn.setEnabled(true);
 
                 player.doubleDown(deck);
                 dealer.draw(deck);
                 calculateWinner(infoLabel);
 
                 gamePanel.reveal = true;
-                gamePanel.updateScores();
                 player.updateLabels(betLabel, moneyLabel);
 
-                nextRoundBtn.setEnabled(true);
+                gamePanel.updateScores();
                 gamePanel.repaint();
             }
         });
@@ -226,6 +228,7 @@ public class Window {
                 dealer.dealHand(deck);
 
                 gamePanel.reveal = false;
+                gamePanel.start = false;
                 betBtn.setEnabled(true);
                 betInput.setEnabled(true);
                 hitBtn.setEnabled(false);
@@ -241,10 +244,9 @@ public class Window {
                 player.updateLabels(betLabel, moneyLabel);
 
                 if (player.money <= 0) {
-                    notifyGameOver();
+                    gamePanel.start = false;
+                    notifyGameOver(betLabel, moneyLabel);
                 }
-
-                System.out.println(deck.list.size());
             }
         });
 
@@ -281,7 +283,7 @@ public class Window {
         }
     }
 
-    private void notifyGameOver() {
+    private void notifyGameOver(JLabel betLabel, JLabel moneyLabel) {
         int response = JOptionPane.showConfirmDialog(null,
             "You've lost all your money! Would you like to restart the game?",
             "Game Over",
@@ -290,6 +292,7 @@ public class Window {
 
         if (response == JOptionPane.YES_OPTION) {
             player.reset();
+            player.updateLabels(betLabel, moneyLabel);
         } else {
             System.exit(0);
         }

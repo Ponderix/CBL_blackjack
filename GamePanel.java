@@ -7,6 +7,7 @@ public class GamePanel extends JPanel {
     Player player;
     Dealer dealer;
     public boolean reveal = false;
+    public boolean start = false;
 
     public static int CARD_WIDTH = 100;
     public static int CARD_HEIGHT = 143;
@@ -45,12 +46,20 @@ public class GamePanel extends JPanel {
             g.drawImage(revealedCardImage, 20, 20, CARD_WIDTH, CARD_HEIGHT, null);
         }
 
-        // draw the rest of the dealer and player hands
-        drawHand(g, dealer.hand, 1, 20);
-        drawHand(g, player.hand, 0, 320);
+        // if game hasnt started yet then dont draw the rest
+        if (start) {
+            drawHand(g, dealer.hand, 1, 20);
+            drawHand(g, player.hand, 0, 320);
+        }        
     }
 
     public void updateScores() {
+        if (!start) {
+            playerHandLabel.setText("Your hand: ");
+            dealerHandLabel.setText("Dealer hand: ");
+            return;
+        }
+
         playerHandLabel.setText("Your hand: " + player.handValue);
         if (reveal) {
             dealerHandLabel.setText("Dealer hand: " + dealer.handValue);
