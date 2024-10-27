@@ -9,23 +9,24 @@ public class Card {
     public int value;
 
     public static String[] RANK_LIST = {"2", "3", "4", "5", "6", "7", 
-                                        "8", "9", "10", "J", "Q", "K", 
-                                        "A"};
-    public static String[] SUITE_LIST = {"H", "C", "S", "D"};
+                                        "8", "9", "10", "j", "q", "k", 
+                                        "a"};
+    public static String[] SUITE_LIST = {"h", "c", "s", "d"};
 
     public Card(String r, String s) {
-        String upperCaseSuite = s.toUpperCase();
+        String lowerCaseSuite = s.toLowerCase();
+        String lowerCaseRank = r.toLowerCase();
 
         for (String str : RANK_LIST) {
-            if (str.equals(r)) {
-                this.rank = r;
+            if (str.equals(lowerCaseRank)) {
+                this.rank = lowerCaseRank;
                 break;
             }
         }
 
         for (String str : SUITE_LIST) {
-            if (str.equals(upperCaseSuite)) {
-                this.suite = upperCaseSuite;
+            if (str.equals(lowerCaseSuite)) {
+                this.suite = lowerCaseSuite;
                 break;
             }
         }
@@ -44,7 +45,6 @@ public class Card {
             case 11:
                 value = 1;
                 break;
-        
             case 1:
                 value = 11;
                 break;
@@ -67,7 +67,7 @@ public class Card {
         for (int i = 0; i < RANK_LIST.length; i++) {
             if (rank.equals(RANK_LIST[i]) && i < 8) {
                 return i + 2;
-            } else if (rank.equals("A")) {
+            } else if (rank.equals("a")) {
                 return 11;
             } else if (i >= 8) {
                 return 10;

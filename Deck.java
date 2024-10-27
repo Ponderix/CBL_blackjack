@@ -38,24 +38,16 @@ public class Deck {
     // the deck length reduces by 1
     public Card getNextCard() {
         if (list.size() == 0) {
-            return null;
+            throw new EmptyDeckException("The deck is empty. No more cards to draw.");
         }
         Card next = list.get(0);
         list.remove(0);
         return next;
     }
+}
 
-    // DEBUG FUNCTION
-    public static void main(String[] args) {
-        /* Card foo = new Card("A", "H");
-        System.out.println(foo.name());
-        System.out.println(foo.value); 
-
-        Deck goo = new Deck();
-        System.out.println(goo.list.size());
-        goo.shuffle();
-        for (int i = 0; i < Deck.LENGTH; i++) {
-            System.out.println(goo.getNextCard().name());
-        }*/
+class EmptyDeckException extends RuntimeException {
+    public EmptyDeckException(String message) {
+        super(message);
     }
 }

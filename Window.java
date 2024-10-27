@@ -7,14 +7,22 @@ public class Window {
     int height;
     Player player;
     Dealer dealer;
+    Deck deck;
 
     Color green = new Color(78, 106, 84);
 
-    public Window(int w, int h, Player p, Dealer d) {
+    class InvalidBetException extends Exception {
+        public InvalidBetException(String message) {
+            super(message);
+        }
+    }
+
+    public Window(int w, int h, Player p, Dealer d, Deck dk) {
         this.width = w;
         this.height = h;
         this.player = p;
         this.dealer = d;
+        this.deck = dk;
     }
 
     public void generate() {
@@ -24,34 +32,35 @@ public class Window {
         JButton betBtn = new JButton("Bet");
         betBtn.setFocusable(false);
         JButton hitBtn = new JButton("Hit");
-        hitBtn.setFocusable(false);
         hitBtn.setEnabled(false);
         JButton standBtn = new JButton("Stand");
-        standBtn.setFocusable(false);
         standBtn.setEnabled(false);
         JButton surrenderBtn = new JButton("Surrender");
-        surrenderBtn.setFocusable(false);
         surrenderBtn.setEnabled(false);
         JButton doubleDownBtn = new JButton("Double Down");
-        doubleDownBtn.setFocusable(false);
         doubleDownBtn.setEnabled(false);
         JButton nextRoundBtn = new JButton("Next round");
-        nextRoundBtn.setFocusable(false);
         nextRoundBtn.setEnabled(false);
 
         JLabel betLabel = new JLabel();
-        JLabel moneyLabel = new JLabel(player.money + "");
+        JLabel moneyLabel = new JLabel("Your money: " + player.money);
+        JLabel infoLabel = new JLabel("Your turn");
 
         frame.setSize(width, height);
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        GamePanel gamePanel = new GamePanel(player, dealer);
+        JPanel controlPanel = new JPanel();
+        JPanel labelPanel = new JPanel();
         JPanel buttonPanel = new JPanel();
         JPanel moneyPanel = new JPanel();
 
+        GamePanel gamePanel = new GamePanel(player, dealer, labelPanel);
+
         gamePanel.setBackground(green);
         gamePanel.setLayout(new BorderLayout());
+
+        controlPanel.setLayout(new BorderLayout());
 
         buttonPanel.add(betInput);
         buttonPanel.add(betBtn);
@@ -61,46 +70,99 @@ public class Window {
         buttonPanel.add(doubleDownBtn);
         buttonPanel.add(nextRoundBtn);
 
-        moneyPanel.setLayout(new BorderLayout());
-        moneyPanel.add(moneyLabel);
+        moneyPanel.setLayout(new GridLayout(1, 3));
         moneyPanel.add(betLabel);
+        moneyPanel.add(moneyLabel);
+        moneyPanel.add(infoLabel);
 
         frame.add(gamePanel);
-        frame.add(moneyPanel, BorderLayout.SOUTH); // FIX POSITIONING
-        frame.add(buttonPanel, BorderLayout.SOUTH);
+        frame.add(controlPanel, BorderLayout.SOUTH);
+
+        controlPanel.add(labelPanel, BorderLayout.NORTH);
+        controlPanel.add(moneyPanel, BorderLayout.CENTER);
+        controlPanel.add(buttonPanel, BorderLayout.SOUTH);
         
+        gamePanel.repaint();
         frame.setVisible(true);
 
         // the bet itself initiates the cycle
         betBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                betBtn.setEnabled(false);
-                betInput.setEnabled(false);
-                hitBtn.setEnabled(true);
-                standBtn.setEnabled(true);
-                surrenderBtn.setEnabled(true);
-                doubleDownBtn.setEnabled(true);
-                // validate bet
-                // player.bet(amount)
+                String betAmountText = betInput.getText().trim();
+
+                try {
+                    float betAmount = Float.parseFloat(betAmountText);
+
+                    if (betAmount > player.money || betAmount <= 0) {
+                        throw new InvalidBetException(
+                            "Bet amount exceeds limit or is non-positive.");
+                    }
+
+                    player.bet(betAmount);
+                    player.updateLabels(betLabel, moneyLabel);
+
+                    /* disable double down if subtracting the same bet amount again  
+                    would result in negative money.*/ 
+                    if (!(player.money - betAmount < 0)) {
+                        doubleDownBtn.setEnabled(true);
+                    }
+                    betBtn.setEnabled(false);
+                    betInput.setEnabled(false);
+                    hitBtn.setEnabled(true);
+                    standBtn.setEnabled(true);
+                    surrenderBtn.setEnabled(true);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(frame, 
+                        "Please enter a valid number for the bet.", "Invalid Input", 
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                } catch (InvalidBetException ex) {
+                    JOptionPane.showMessageDialog(frame, 
+                        ex.getMessage(), "Invalid Bet", 
+                        JOptionPane.ERROR_MESSAGE);
+                }
+
                 gamePanel.repaint();
             }
         });
 
         hitBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                player.hit();
-                standBtn.setEnabled(false);
                 surrenderBtn.setEnabled(false);
                 doubleDownBtn.setEnabled(false);
-                // recalculate player
-                    // if hand.value >= 21 then 
-                    // hitbutton disabled
-                    // dealer.draw();
-                    gamePanel.reveal = true;
-                    // calculate winner
-                    // payout bets
-                    nextRoundBtn.setEnabled(true);
+
+                player.hit(deck);
                 gamePanel.repaint();
+                gamePanel.updateScores();
+
+                if (player.handValue > 21) {                    
+                    hitBtn.setEnabled(false);
+                    standBtn.setEnabled(false);
+                    nextRoundBtn.setEnabled(true);
+
+                    gamePanel.updateScores();
+
+                    infoLabel.setText("You lost. Next round.");
+                    player.payout(0);
+                    
+                    gamePanel.reveal = true;
+                    player.updateLabels(betLabel, moneyLabel);
+
+                    gamePanel.repaint();
+                } else if (player.handValue == 21) {
+                    hitBtn.setEnabled(false);
+                    standBtn.setEnabled(false);
+                    nextRoundBtn.setEnabled(true);
+
+                    dealer.draw(deck);
+                    gamePanel.updateScores();
+                    calculateWinner(infoLabel);
+
+                    gamePanel.reveal = true;
+                    player.updateLabels(betLabel, moneyLabel);
+
+                    gamePanel.repaint();
+                }                    
             }
         });
         standBtn.addActionListener(new ActionListener() {
@@ -109,11 +171,15 @@ public class Window {
                 standBtn.setEnabled(false);
                 surrenderBtn.setEnabled(false);
                 doubleDownBtn.setEnabled(false);
-                // dealer.draw();
-                gamePanel.reveal = true;
-                // calculate winner
-                // payout bets
                 nextRoundBtn.setEnabled(true);
+
+                dealer.draw(deck);
+                gamePanel.updateScores();
+                calculateWinner(infoLabel);
+
+                gamePanel.reveal = true;
+                player.updateLabels(betLabel, moneyLabel);
+
                 gamePanel.repaint();
             }
         });
@@ -123,9 +189,12 @@ public class Window {
                 standBtn.setEnabled(false);
                 surrenderBtn.setEnabled(false);
                 doubleDownBtn.setEnabled(false);
-                // player surrender
-                // payout bets
                 nextRoundBtn.setEnabled(true);
+
+                infoLabel.setText("Surrender, you get back 0.5x bet. Next round.");
+                player.payout(0.5f);
+                player.updateLabels(betLabel, moneyLabel);
+
                 gamePanel.repaint();
             }
         });
@@ -135,11 +204,15 @@ public class Window {
                 standBtn.setEnabled(false);
                 surrenderBtn.setEnabled(false);
                 doubleDownBtn.setEnabled(false);
-                // player.doubleDown();
-                // dealer.draw();
+
+                player.doubleDown(deck);
+                dealer.draw(deck);
+                calculateWinner(infoLabel);
+
                 gamePanel.reveal = true;
-                // calculate winner
-                // payout bets
+                gamePanel.updateScores();
+                player.updateLabels(betLabel, moneyLabel);
+
                 nextRoundBtn.setEnabled(true);
                 gamePanel.repaint();
             }
@@ -147,9 +220,10 @@ public class Window {
 
         nextRoundBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // shuffle deck
-                // new dealer hand
-                // new player hand
+                player.returnCard(deck);
+                dealer.returnCard(deck);
+                player.dealHand(deck);
+                dealer.dealHand(deck);
 
                 gamePanel.reveal = false;
                 betBtn.setEnabled(true);
@@ -159,21 +233,66 @@ public class Window {
                 surrenderBtn.setEnabled(false);
                 doubleDownBtn.setEnabled(false);
                 nextRoundBtn.setEnabled(false);
+                infoLabel.setText("Your turn.");
 
                 gamePanel.removeAll();
                 gamePanel.repaint();
+                gamePanel.updateScores();
+                player.updateLabels(betLabel, moneyLabel);
+
+                if (player.money <= 0) {
+                    notifyGameOver();
+                }
+
+                System.out.println(deck.list.size());
             }
         });
 
         gamePanel.repaint();
     }
 
-    public static void main(String[] args) {
-        Window game = new Window(800, 600, new Player(), new Dealer());
+    private void calculateWinner(JLabel label) {
+        int playerDiff = 21 - player.handValue;
+        int dealerDiff = 21 - dealer.handValue;
 
-        SwingUtilities.invokeLater(() -> {
-            game.generate(); 
-        });
+        if (playerDiff == 0 && dealerDiff != 0) {
+            label.setText("BlackJack, you win 1.5x your bet! Next round.");
+            player.payout(2.5f);
+        }
+        if (playerDiff == dealerDiff) {
+            label.setText("You tie. Next round.");
+            player.payout(1);
+        }
+
+        if (playerDiff < 0) {
+            label.setText("You lost. Next round.");
+            player.payout(0);
+        }
+
+        if (playerDiff > 0) {
+            if (dealerDiff < 0 || playerDiff < dealerDiff) {
+                label.setText("You won! Next round.");
+                player.payout(2);
+            } else {
+                String blackjack = "Dealer blackjack, you lose. Next round.";
+                label.setText(dealerDiff == 0 ? blackjack : "You lost! Next round.");
+                player.payout(0);
+            }
+        }
+    }
+
+    private void notifyGameOver() {
+        int response = JOptionPane.showConfirmDialog(null,
+            "You've lost all your money! Would you like to restart the game?",
+            "Game Over",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+
+        if (response == JOptionPane.YES_OPTION) {
+            player.reset();
+        } else {
+            System.exit(0);
+        }
     }
 }
 

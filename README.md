@@ -7,4 +7,6 @@ The game mechanics cover shuffling and dealing cards, as well as calculating han
 
 # References
 Images:
-Torbjornhedqvist. “Torbjornhedqvist/Blackjack: A Black Jack Game Written in Python and Pygame.” GitHub, github.com/torbjornhedqvist/blackjack. Accessed 17 Oct. 2024. 
+(copyright) Torbjornhedqvist. “Torbjornhedqvist/Blackjack: A Black Jack Game Written in Python and Pygame.” GitHub, https://github.com/torbjornhedqvist/blackjack. Accessed 17 Oct. 2024. 
+
+(copyright) htdebeer. "SVG-cards: A set of playing cards in SVG, now also with a rendering in PNG and installable via NPM." Github, https://github.com/htdebeer/SVG-cards/tree/master. Accessed 17 Oct. 2024.

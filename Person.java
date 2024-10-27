@@ -4,7 +4,6 @@ import java.util.Arrays;
 public class Person {
     protected int handValue = 0;
     protected ArrayList<Card> hand = new ArrayList<>();
-    protected boolean currentTurn = false;
 
     // Class: Person 
     // Base class for both players and dealer. 
@@ -15,7 +14,7 @@ public class Person {
         ArrayList<Card> aces = new ArrayList<>();
 
         for (int i = 0; i < hand.size(); i++) {
-            if (hand.get(i).rank.equals("A")) {
+            if (hand.get(i).rank.equals("a")) {
                 aces.add(hand.get(i));
             }
         }
@@ -24,14 +23,22 @@ public class Person {
             value += card.value;
         }
 
-        if (aces.size() > 0 && value > 21) {
+        if (!aces.isEmpty() && value > 21) {
             for (Card ace : aces) {
+                System.out.println("ace val b4: " + ace.value);
+                if (ace.value != 11) {
+                    System.out.println("ace after: " + ace.value);
+                    break;
+                }
                 ace.switchAceValue();
+                value -= 10;
+                if (value <= 21) {
+                    System.out.println("ace after: " + ace.value);
+                    break;
+                }
             }
-            calculateHandValue();
-        } else {
-            handValue = value;
         }
+        handValue = value;
     }
 
     public void dealHand(Deck deck) {
@@ -41,17 +48,10 @@ public class Person {
         calculateHandValue();
     }
 
-    // DEBUG FUNCTION
-    public static void main(String[] args) {
-        ArrayList<Card> list = new ArrayList<>();
-        list.add(new Card("2", "H"));
-        list.add(new Card("3", "d"));
-
-        Person joe = new Person();
-        Deck deck = new Deck();
-        deck.shuffle();
-
-        joe.dealHand(deck);
-        System.out.println(joe.handValue);
+    public void returnCard(Deck deck) {
+        for (Card card : hand) {
+            deck.list.add(card);
+        }
+        hand.clear();
     }
 }
