@@ -1,16 +1,22 @@
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
 import java.util.Collections;
+import java.util.Random;
 
+/**
+ * Represents a standard deck of 52 playing cards. The deck is initialized with 
+ * all possible combinations of ranks and suits. It provides methods to shuffle 
+ * the deck and draw the next card.
+ */
 public class Deck {
-    public static int LENGTH = 52; // use only when looping over 52 cards
+    public static int LENGTH = 52;
 
     public ArrayList<Card> list = new ArrayList<>();
 
-    // buildDeck() 
-    // Creates a deck of 52 cards with 4 suits and 13 values each. 
-    // Adds cards to a list. 
+    /**
+     * Constructs a new deck of cards by creating instances of `Card` for 
+     * each combination of rank and suit. The deck will initially contain all 
+     * 52 cards.
+     */
     public Deck() {
         for (int i = 0; i < Card.SUITE_LIST.length; i++) {
             for (int j = 0; j < Card.RANK_LIST.length; j++) {
@@ -20,22 +26,28 @@ public class Deck {
         }
     }
     
-
-    // shuffle() 
-    // Shuffles the current deck randomly. Uses simple swapping for shuffling. 
+    /**
+     * Shuffles the deck of cards using a randomization algorithm. The order of 
+     * the cards in the deck is randomized, allowing for a new game to start 
+     * with a shuffled deck.
+     */
     public void shuffle() {
         int length = list.size();
         Random random = new Random();
         for (int i = 0; i < length - 1; i++) {
-            int randomInt = random.nextInt(length  - i) + i;
-
-            // swap lowermost card with random card
+            int randomInt = random.nextInt(length - i) + i;
             Collections.swap(list, i, randomInt);
         }
     }
 
-    // removes the first card object from the deck
-    // the deck length reduces by 1
+    /**
+     * Draws the next card from the top of the deck. If the deck is empty, an 
+     * `EmptyDeckException` is thrown. The card is removed from the deck 
+     * after being drawn.
+     *
+     * @return the next card in the deck
+     * @throws EmptyDeckException if there are no cards left in the deck
+     */
     public Card getNextCard() {
         if (list.size() == 0) {
             throw new EmptyDeckException("The deck is empty. No more cards to draw.");
@@ -46,8 +58,12 @@ public class Deck {
     }
 }
 
+/**
+ * Exception thrown when an attempt is made to draw a card from an empty deck.
+ */
 class EmptyDeckException extends RuntimeException {
     public EmptyDeckException(String message) {
         super(message);
     }
 }
+
