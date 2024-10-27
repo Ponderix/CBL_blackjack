@@ -27,7 +27,7 @@ public class Blackjack {
         player.dealHand(deck); 
         dealer.dealHand(deck); 
 
-        Window game = new Window(800, 600, player, dealer, deck);
+        Window game = new Window(1000, 600, player, dealer, deck);
         SwingUtilities.invokeLater(() -> {
             game.generate(); 
         });

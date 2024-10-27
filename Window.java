@@ -309,7 +309,7 @@ public class Window {
                 player.payout(2);
             } else {
                 String blackjack = "Dealer blackjack, you lose. Next round.";
-                label.setText(dealerDiff == 0 ? blackjack : "You lost! Next round.");
+                label.setText(dealerDiff == 0 ? blackjack : "You lost. Next round.");
                 player.payout(0);
             }
         }
